@@ -37,7 +37,7 @@ import './globals.js'
 import './jquery/index.js'
 import { initCore } from './init.js'
 
-console.debug('TEST')
+console.debug('TEST COMPILE')
 
 window.addEventListener('DOMContentLoaded', function() {
 	initCore()
