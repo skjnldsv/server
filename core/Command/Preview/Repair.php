@@ -160,7 +160,9 @@ class Repair extends Command {
 		}
 
 		// register the SIGINT listener late in here to be able to exit in the early process of this command
-		pcntl_signal(SIGINT, [$this, 'sigIntHandler']);
+		if (function_exists('pcntl_signal')) {
+			pcntl_signal(SIGINT, [$this, 'sigIntHandler']);
+		}
 
 		$output->writeln("");
 		$output->writeln("");
@@ -174,7 +176,10 @@ class Repair extends Command {
 		$progressBar->start();
 
 		foreach ($directoryListing as $oldPreviewFolder) {
-			pcntl_signal_dispatch();
+			if (function_exists('pcntl_signal_dispatch')) {
+				pcntl_signal_dispatch();
+			}
+
 			$name = $oldPreviewFolder->getName();
 			$time = (new \DateTime())->format('H:i:s');
 			$section1->writeln("$time Migrating previews of file with fileId $name …");
@@ -239,7 +244,10 @@ class Repair extends Command {
 				}
 
 				foreach ($previews as $preview) {
-					pcntl_signal_dispatch();
+					if (function_exists('pcntl_signal_dispatch')) {
+						pcntl_signal_dispatch();
+					}
+
 					$previewName = $preview->getName();
 
 					if ($preview instanceof Folder) {

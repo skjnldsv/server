@@ -41,7 +41,6 @@ jobs:
         mariadb-versions: ['10.2', '10.4', '10.6']
         php-versions: ['8.0']
         group: ['DB']
-        exclude-group: ['']
 
     services:
       mysql:
@@ -65,6 +64,7 @@ jobs:
           # https://docs.nextcloud.com/server/stable/admin_manual/installation/source_installation.html#prerequisites-for-manual-installation
           extensions: bz2, ctype, curl, dom, fileinfo, gd, iconv, intl, json, libxml, mbstring, openssl, pcntl, posix, session, simplexml, xmlreader, xmlwriter, zip, zlib, mysql, pdo_mysql
           coverage: none
+          tools: phpunit:9
           ini-file: development
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -91,7 +91,6 @@ jobs:
         run: |
           mkdir data
           ./occ maintenance:install --verbose --database=mysql --database-name=nextcloud --database-host=127.0.0.1 --database-port=$DB_PORT --database-user=root --database-pass=rootpassword --admin-user admin --admin-pass admin
-          ./occ app:enable --force ${{ env.APP_NAME }}
 
       - name: Check PHPUnit script is defined
         id: check_phpunit
@@ -102,7 +101,7 @@ jobs:
       - name: PHPUnit
         # Only run if phpunit config file exists
         if: steps.check_phpunit.outcome == 'success'
-        run: composer run test:unit -- --group=${{ matrix.group }} --exclude-group=${{ matrix.exclude-group }}
+        run: composer run test:unit -- --group="${{ matrix.group }}"
 
       - name: Check PHPUnit integration script is defined
         id: check_integration
@@ -119,6 +118,10 @@ jobs:
         # Only run if phpunit integration config file exists
         if: steps.check_integration.outcome == 'success'
         run: composer run test:integration
+
+      - name: Run repair steps
+        run: |
+          ./occ maintenance:repair --include-expensive
 
       - name: Print logs
         if: always()
