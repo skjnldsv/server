@@ -1,4 +1,4 @@
-name: Auto-prepend Stable Branch to PR Title
+name: Update PRs titles on stable branches
 
 on:
   pull_request:
